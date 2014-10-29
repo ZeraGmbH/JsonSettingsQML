@@ -1,0 +1,3 @@
+module JsonSettings
+plugin JsonSettings
+typeinfo plugins.qmltypes
