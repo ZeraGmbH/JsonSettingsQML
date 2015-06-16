@@ -13,6 +13,7 @@ public:
 
   static JsonSettingsFile* getInstance();
 
+  Q_INVOKABLE bool fileExists(const QString &filePath) const;
   Q_INVOKABLE void reloadFile();
   Q_INVOKABLE void loadFromFile(const QString &filePath);
   Q_INVOKABLE void saveToFile(const QString &filePath, bool overwrite=false);

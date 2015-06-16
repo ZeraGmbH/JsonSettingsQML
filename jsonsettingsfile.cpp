@@ -34,6 +34,18 @@ JsonSettingsFile *JsonSettingsFile::getInstance()
   return globalSettings;
 }
 
+bool JsonSettingsFile::fileExists(const QString &filePath) const
+{
+  bool retVal = false;
+  QFile f;
+  f.setFileName(filePath);
+  if(f.exists())
+  {
+    retVal = true;
+  }
+  return retVal;
+}
+
 void JsonSettingsFile::reloadFile()
 {
   Q_D(JsonSettingsFile);
