@@ -6,6 +6,15 @@ CONFIG += qt plugin
 TARGET = $$qtLibraryTarget($$TARGET)
 uri = JsonSettings
 
+exists( ../include/project-paths.pri ) {
+  include(../include/project-paths.pri)
+}
+else:exists( ../../project-paths.pri ) {
+  include(../../project-paths.pri)
+} else:exists(../gui-session.pri) {
+  include(../gui-session.pri)
+}
+
 # Input
 SOURCES += \
     jsonglobalsettings.cpp \
@@ -25,13 +34,6 @@ OTHER_FILES = qmldir
     copy_qmldir.commands = $(COPY_FILE) \"$$replace(copy_qmldir.depends, /, $$QMAKE_DIR_SEP)\" \"$$replace(copy_qmldir.target, /, $$QMAKE_DIR_SEP)\"
     QMAKE_EXTRA_TARGETS += copy_qmldir
     PRE_TARGETDEPS += $$copy_qmldir.target
-}
-
-equals(QT_MAJOR_VERSION, 5){
-  equals(QT_MINOR_VERSION, 3){
-    #Qt is broken: https://bugreports.qt-project.org/browse/QTBUG-37638
-    CONFIG -= android_install
-  }
 }
 
 qmldir.files = qmldir
