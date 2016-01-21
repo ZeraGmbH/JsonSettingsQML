@@ -3,6 +3,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonValue>
+#include <QStandardPaths>
 #include <QDebug>
 
 class JsonSettingsFilePrivate {
@@ -52,9 +53,16 @@ void JsonSettingsFile::reloadFile()
   loadFromFile(d->settingsFilePath);
 }
 
-void JsonSettingsFile::loadFromFile(const QString &filePath)
+bool JsonSettingsFile::loadFromStandardLocation(const QString &fileName)
+{
+  qDebug() << "[json-settings-qml] Attempting to load settings file from standard location:" << QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
+  return loadFromFile(QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)).arg(fileName));
+}
+
+bool JsonSettingsFile::loadFromFile(const QString &filePath)
 {
   Q_D(JsonSettingsFile);
+  bool retVal = false;
   QFile f;
   f.setFileName(filePath);
   if(f.exists() && f.open(QFile::ReadOnly))
@@ -65,14 +73,17 @@ void JsonSettingsFile::loadFromFile(const QString &filePath)
     if(err.error == QJsonParseError::NoError)
     {
       d->dataHolder = jsonDoc.object();
+      retVal = true;
+      emit settingsChanged(this);
+      qDebug() << "[json-settings-qml] Settings file loaded:" << filePath;
     }
     f.close();
-    emit settingsChanged(this);
   }
   else
   {
     qDebug() << "[json-settings-qml] Settings file does not exists:" << filePath;
   }
+  return retVal;
 }
 
 void JsonSettingsFile::saveToFile(const QString &filePath, bool overwrite)
