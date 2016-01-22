@@ -55,7 +55,7 @@ void JsonSettingsFile::reloadFile()
 
 bool JsonSettingsFile::loadFromStandardLocation(const QString &fileName)
 {
-  qDebug() << "[json-settings-qml] Attempting to load settings file from standard location:" << QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
+  qDebug() << "[json-settings-qml] Attempting to load settings file from standard location:" << QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)).arg(fileName);
   return loadFromFile(QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)).arg(fileName));
 }
 
