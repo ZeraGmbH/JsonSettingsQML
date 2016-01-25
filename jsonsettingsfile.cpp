@@ -100,7 +100,7 @@ void JsonSettingsFile::saveToFile(const QString &filePath, bool overwrite)
   }
 }
 
-const QString &JsonSettingsFile::getCurrentFilePath()
+QString JsonSettingsFile::getCurrentFilePath()
 {
   Q_D(JsonSettingsFile);
   return d->settingsFilePath;

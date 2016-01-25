@@ -18,7 +18,7 @@ public:
   Q_INVOKABLE bool loadFromStandardLocation(const QString &fileName);
   Q_INVOKABLE bool loadFromFile(const QString &filePath);
   Q_INVOKABLE void saveToFile(const QString &filePath, bool overwrite=false);
-  Q_INVOKABLE const QString &getCurrentFilePath();
+  Q_INVOKABLE QString getCurrentFilePath();
 
   Q_INVOKABLE bool hasOption(const QString &key);
   Q_INVOKABLE QString getOption(const QString &key);
