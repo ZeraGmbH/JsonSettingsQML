@@ -8,38 +8,38 @@
 
 class JsonSettingsFilePrivate {
 
-  JsonSettingsFilePrivate(JsonSettingsFile* qPtr) : q_ptr(qPtr) {}
+  JsonSettingsFilePrivate(JsonSettingsFile *t_qPtr) : q_ptr(t_qPtr) {}
 
-  JsonSettingsFile* q_ptr;
-  QString settingsFilePath;
+  JsonSettingsFile *q_ptr;
+  QString m_settingsFilePath;
 
-  QJsonObject dataHolder;
+  QJsonObject m_dataHolder;
 
   Q_DECLARE_PUBLIC(JsonSettingsFile)
 };
 
 
 
-JsonSettingsFile::JsonSettingsFile(QQuickItem *parent) :
-  QQuickItem(parent),
+JsonSettingsFile::JsonSettingsFile(QQuickItem *t_parent) :
+  QQuickItem(t_parent),
   d_ptr(new JsonSettingsFilePrivate(this))
 {
 }
 
 JsonSettingsFile *JsonSettingsFile::getInstance()
 {
-  if(globalSettings==0)
+  if(s_globalSettings==0)
   {
-    globalSettings = new JsonSettingsFile();
+    s_globalSettings = new JsonSettingsFile();
   }
-  return globalSettings;
+  return s_globalSettings;
 }
 
-bool JsonSettingsFile::fileExists(const QString &filePath) const
+bool JsonSettingsFile::fileExists(const QString &t_filePath) const
 {
   bool retVal = false;
   QFile f;
-  f.setFileName(filePath);
+  f.setFileName(t_filePath);
   if(f.exists())
   {
     retVal = true;
@@ -50,34 +50,34 @@ bool JsonSettingsFile::fileExists(const QString &filePath) const
 void JsonSettingsFile::reloadFile()
 {
   Q_D(JsonSettingsFile);
-  loadFromFile(d->settingsFilePath);
+  loadFromFile(d->m_settingsFilePath);
 }
 
-bool JsonSettingsFile::loadFromStandardLocation(const QString &fileName)
+bool JsonSettingsFile::loadFromStandardLocation(const QString &t_fileName)
 {
-  qDebug() << "[json-settings-qml] Attempting to load settings file from standard location:" << QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)).arg(fileName);
-  return loadFromFile(QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)).arg(fileName));
+  qDebug() << "[json-settings-qml] Attempting to load settings file from standard location:" << QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)).arg(t_fileName);
+  return loadFromFile(QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)).arg(t_fileName));
 }
 
 bool JsonSettingsFile::loadFromFile(const QString &filePath)
 {
   Q_D(JsonSettingsFile);
   bool retVal = false;
-  QFile f;
-  f.setFileName(filePath);
-  if(f.exists() && f.open(QFile::ReadOnly))
+  QFile settingsFile;
+  settingsFile.setFileName(filePath);
+  if(settingsFile.exists() && settingsFile.open(QFile::ReadOnly))
   {
-    d->settingsFilePath = filePath;
+    d->m_settingsFilePath = filePath;
     QJsonParseError err;
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(f.readAll(), &err);
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(settingsFile.readAll(), &err);
     if(err.error == QJsonParseError::NoError)
     {
-      d->dataHolder = jsonDoc.object();
+      d->m_dataHolder = jsonDoc.object();
       retVal = true;
       emit settingsChanged(this);
       qDebug() << "[json-settings-qml] Settings file loaded:" << filePath;
     }
-    f.close();
+    settingsFile.close();
   }
   else
   {
@@ -86,89 +86,89 @@ bool JsonSettingsFile::loadFromFile(const QString &filePath)
   return retVal;
 }
 
-void JsonSettingsFile::saveToFile(const QString &filePath, bool overwrite)
+void JsonSettingsFile::saveToFile(const QString &t_filePath, bool t_overwrite)
 {
   Q_D(JsonSettingsFile);
-  QFile f;
-  f.setFileName(filePath);
-  if(filePath.isEmpty() == false && (!f.exists() || overwrite) && f.open(QFile::WriteOnly))
+  QFile settingsFile;
+  settingsFile.setFileName(t_filePath);
+  if((t_filePath.isEmpty() == false) && (!settingsFile.exists() || t_overwrite) && settingsFile.open(QFile::WriteOnly))
   {
     QJsonDocument jsonDoc;
-    jsonDoc.setObject(d->dataHolder);
-    f.write(jsonDoc.toJson());
-    f.close();
+    jsonDoc.setObject(d->m_dataHolder);
+    settingsFile.write(jsonDoc.toJson());
+    settingsFile.close();
   }
 }
 
 QString JsonSettingsFile::getCurrentFilePath()
 {
   Q_D(JsonSettingsFile);
-  return d->settingsFilePath;
+  return d->m_settingsFilePath;
 }
 
-bool JsonSettingsFile::hasOption(const QString &key)
+bool JsonSettingsFile::hasOption(const QString &t_key)
 {
   Q_D(JsonSettingsFile);
   bool retVal=false;
-  if(d->dataHolder.value(key) != QJsonValue::Undefined)
+  if(d->m_dataHolder.value(t_key) != QJsonValue::Undefined)
   {
     retVal = true;
   }
   return retVal;
 }
 
-QString JsonSettingsFile::getOption(const QString &key)
+QString JsonSettingsFile::getOption(const QString &t_key)
 {
   Q_D(JsonSettingsFile);
   QString retVal;
-  if(hasOption(key))
+  if(hasOption(t_key))
   {
-    retVal = d->dataHolder.value(key).toString();
+    retVal = d->m_dataHolder.value(t_key).toString();
   }
   else
   {
-    if(d->settingsFilePath.isEmpty() == false)
+    if(d->m_settingsFilePath.isEmpty() == false)
     {
-      qDebug() << "[json-settings-qml] Could not find data for key:" << key;
+      qDebug() << "[json-settings-qml] Could not find data for key:" << t_key;
     }
   }
   return retVal;
 }
 
-bool JsonSettingsFile::setOption(const QString &key, QString value, bool addIfNotExists)
+bool JsonSettingsFile::setOption(const QString &t_key, const QString &t_value, bool t_addIfNotExists)
 {
   Q_D(JsonSettingsFile);
   bool retVal = false;
-  if(hasOption(key) || addIfNotExists)
+  if(hasOption(t_key) || t_addIfNotExists)
   {
-    d->dataHolder.insert(key, value);
+    d->m_dataHolder.insert(t_key, t_value);
     retVal=true;
     emit settingsChanged(this);
   }
   else
   {
-    qDebug() << "[json-settings-qml] Refused to set nonexisting key:" << key;
+    qDebug() << "[json-settings-qml] Refused to set nonexisting key:" << t_key;
   }
 
   return retVal;
 }
 
-bool JsonSettingsFile::dropOption(const QString &key)
+bool JsonSettingsFile::dropOption(const QString &t_key)
 {
   Q_D(JsonSettingsFile);
   bool retVal = false;
-  if(hasOption(key))
+  if(hasOption(t_key))
   {
-    d->dataHolder.remove(key);
+    d->m_dataHolder.remove(t_key);
     retVal = true;
     emit settingsChanged(this);
   }
   else
   {
-    qDebug() << "[json-settings-qml] Refused to delete nonexistant key:" << key;
+    qDebug() << "[json-settings-qml] Refused to delete nonexistant key:" << t_key;
   }
 
   return retVal;
 }
 
-JsonSettingsFile *JsonSettingsFile::globalSettings = 0;
+JsonSettingsFile *JsonSettingsFile::s_globalSettings = 0;
