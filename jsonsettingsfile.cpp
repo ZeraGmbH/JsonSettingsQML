@@ -59,15 +59,15 @@ bool JsonSettingsFile::loadFromStandardLocation(const QString &t_fileName)
   return loadFromFile(QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)).arg(t_fileName));
 }
 
-bool JsonSettingsFile::loadFromFile(const QString &filePath)
+bool JsonSettingsFile::loadFromFile(const QString &t_filePath)
 {
   Q_D(JsonSettingsFile);
   bool retVal = false;
   QFile settingsFile;
-  settingsFile.setFileName(filePath);
+  settingsFile.setFileName(t_filePath);
   if(settingsFile.exists() && settingsFile.open(QFile::ReadOnly))
   {
-    d->m_settingsFilePath = filePath;
+    d->m_settingsFilePath = t_filePath;
     QJsonParseError err;
     QJsonDocument jsonDoc = QJsonDocument::fromJson(settingsFile.readAll(), &err);
     if(err.error == QJsonParseError::NoError)
@@ -75,13 +75,13 @@ bool JsonSettingsFile::loadFromFile(const QString &filePath)
       d->m_dataHolder = jsonDoc.object();
       retVal = true;
       emit settingsChanged(this);
-      qDebug() << "[json-settings-qml] Settings file loaded:" << filePath;
+      qDebug() << "[json-settings-qml] Settings file loaded:" << t_filePath;
     }
     settingsFile.close();
   }
   else
   {
-    qDebug() << "[json-settings-qml] Settings file does not exists:" << filePath;
+    qDebug() << "[json-settings-qml] Settings file does not exists:" << t_filePath;
   }
   return retVal;
 }
