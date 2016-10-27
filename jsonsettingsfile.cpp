@@ -77,11 +77,15 @@ bool JsonSettingsFile::loadFromFile(const QString &t_filePath)
       emit settingsChanged(this);
       qDebug() << "[json-settings-qml] Settings file loaded:" << t_filePath;
     }
+    else
+    {
+      qWarning() << "[json-settings-qml] Error reading settings file:" << err.errorString();
+    }
     settingsFile.close();
   }
   else
   {
-    qDebug() << "[json-settings-qml] Settings file does not exists:" << t_filePath;
+    qWarning() << "[json-settings-qml] Settings file does not exists:" << t_filePath;
   }
   return retVal;
 }
@@ -129,7 +133,7 @@ QString JsonSettingsFile::getOption(const QString &t_key)
   {
     if(d->m_settingsFilePath.isEmpty() == false)
     {
-      qDebug() << "[json-settings-qml] Could not find data for key:" << t_key;
+      qWarning() << "[json-settings-qml] Could not find data for key:" << t_key;
     }
   }
   return retVal;
@@ -147,7 +151,7 @@ bool JsonSettingsFile::setOption(const QString &t_key, const QString &t_value, b
   }
   else
   {
-    qDebug() << "[json-settings-qml] Refused to set nonexisting key:" << t_key;
+    qWarning() << "[json-settings-qml] Refused to set nonexisting key:" << t_key;
   }
 
   return retVal;
