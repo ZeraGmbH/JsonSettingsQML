@@ -5,6 +5,8 @@
 #include <QJsonValue>
 #include <QStandardPaths>
 #include <QDebug>
+#include <QSaveFile>
+#include <QFileInfo>
 
 class JsonSettingsFilePrivate {
 
@@ -93,14 +95,16 @@ bool JsonSettingsFile::loadFromFile(const QString &t_filePath)
 void JsonSettingsFile::saveToFile(const QString &t_filePath, bool t_overwrite)
 {
   Q_D(JsonSettingsFile);
-  QFile settingsFile;
+  QFileInfo fInfo;
+  QSaveFile settingsFile;
+  fInfo.setFile(t_filePath);
   settingsFile.setFileName(t_filePath);
-  if((t_filePath.isEmpty() == false) && (!settingsFile.exists() || t_overwrite) && settingsFile.open(QFile::WriteOnly))
+  if((t_filePath.isEmpty() == false) && (!fInfo.exists() || t_overwrite) && settingsFile.open(QFile::WriteOnly))
   {
     QJsonDocument jsonDoc;
     jsonDoc.setObject(d->m_dataHolder);
     settingsFile.write(jsonDoc.toJson());
-    settingsFile.close();
+    settingsFile.commit();
   }
 }
 
