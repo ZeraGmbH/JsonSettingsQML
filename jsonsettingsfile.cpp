@@ -16,6 +16,7 @@ class JsonSettingsFilePrivate {
   QString m_settingsFilePath;
 
   QJsonObject m_dataHolder;
+  bool m_autoWriteBackEnabled=false;
 
   Q_DECLARE_PUBLIC(JsonSettingsFile)
 };
@@ -26,11 +27,22 @@ JsonSettingsFile::JsonSettingsFile(QQuickItem *t_parent) :
   QQuickItem(t_parent),
   d_ptr(new JsonSettingsFilePrivate(this))
 {
+  //save settings every time something changes if m_dPtr->m_autoWriteBackEnabled is true
+  connect(this,&JsonSettingsFile::settingsChanged,[this](){
+    if(d_ptr->m_autoWriteBackEnabled)
+    {
+      saveToFile(getCurrentFilePath(), true);
+    }
+  });
+}
+
+JsonSettingsFile::~JsonSettingsFile() {
+
 }
 
 JsonSettingsFile *JsonSettingsFile::getInstance()
 {
-  if(s_globalSettings==0)
+  if(s_globalSettings==nullptr)
   {
     s_globalSettings = new JsonSettingsFile();
   }
@@ -179,4 +191,17 @@ bool JsonSettingsFile::dropOption(const QString &t_key)
   return retVal;
 }
 
-JsonSettingsFile *JsonSettingsFile::s_globalSettings = 0;
+bool JsonSettingsFile::autoWriteBackEnabled() const
+{
+  return d_ptr->m_autoWriteBackEnabled;
+}
+
+void JsonSettingsFile::setAutoWriteBackEnabled(bool t_autoWriteBackEnabled)
+{
+  if(d_ptr->m_autoWriteBackEnabled != t_autoWriteBackEnabled)
+  {
+    d_ptr->m_autoWriteBackEnabled=t_autoWriteBackEnabled;
+  }
+}
+
+JsonSettingsFile *JsonSettingsFile::s_globalSettings = nullptr;

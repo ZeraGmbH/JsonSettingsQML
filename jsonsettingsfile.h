@@ -9,7 +9,8 @@ class JsonSettingsFile : public QQuickItem
 {
   Q_OBJECT
 public:
-  explicit JsonSettingsFile(QQuickItem *t_parent = 0);
+  explicit JsonSettingsFile(QQuickItem *t_parent = nullptr);
+  virtual ~JsonSettingsFile();
 
   static JsonSettingsFile *getInstance();
 
@@ -25,6 +26,8 @@ public:
   Q_INVOKABLE bool setOption(const QString &t_key, const QString &t_value, bool t_addIfNotExists=false);
   Q_INVOKABLE bool dropOption(const QString &t_key);
 
+  Q_INVOKABLE bool autoWriteBackEnabled() const;
+  Q_INVOKABLE void setAutoWriteBackEnabled(bool t_autoWriteBackEnabled=true);
 signals:
   void settingsChanged(JsonSettingsFile *settingsFile);
 
