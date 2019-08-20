@@ -28,7 +28,7 @@ JsonSettingsFile::JsonSettingsFile(QQuickItem *t_parent) :
   d_ptr(new JsonSettingsFilePrivate(this))
 {
   //save settings every time something changes if m_dPtr->m_autoWriteBackEnabled is true
-  connect(this,&JsonSettingsFile::settingsChanged,[this](){
+  connect(this,&JsonSettingsFile::settingsSaveRequest,[this](){
     if(d_ptr->m_autoWriteBackEnabled)
     {
       saveToFile(getCurrentFilePath(), true);
@@ -88,7 +88,6 @@ bool JsonSettingsFile::loadFromFile(const QString &t_filePath)
     {
       d->m_dataHolder = jsonDoc.object();
       retVal = true;
-      emit settingsChanged(this);
       qDebug() << "[json-settings-qml] Settings file loaded:" << t_filePath;
     }
     else
@@ -137,7 +136,7 @@ bool JsonSettingsFile::hasOption(const QString &t_key)
   return retVal;
 }
 
-QString JsonSettingsFile::getOption(const QString &t_key)
+QString JsonSettingsFile::getOption(const QString &t_key, const QString &t_valueDefault)
 {
   Q_D(JsonSettingsFile);
   QString retVal;
@@ -149,7 +148,16 @@ QString JsonSettingsFile::getOption(const QString &t_key)
   {
     if(d->m_settingsFilePath.isEmpty() == false)
     {
-      qWarning() << "[json-settings-qml] Could not find data for key:" << t_key;
+      if(!t_valueDefault.isEmpty())
+      {
+        d->m_dataHolder.insert(t_key, t_valueDefault);
+        emit settingsSaveRequest(this);
+        retVal = t_valueDefault;
+      }
+      else
+      {
+        qWarning() << "[json-settings-qml] Could not find data and no default set for key:" << t_key;
+      }
     }
   }
   return retVal;
@@ -159,11 +167,15 @@ bool JsonSettingsFile::setOption(const QString &t_key, const QString &t_value, b
 {
   Q_D(JsonSettingsFile);
   bool retVal = false;
-  if(hasOption(t_key) || t_addIfNotExists)
+  if(t_addIfNotExists)
   {
-    d->m_dataHolder.insert(t_key, t_value);
-    retVal=true;
-    emit settingsChanged(this);
+    if(!hasOption(t_key) || d->m_dataHolder.value(t_key).toString() != t_value)
+    {
+      d->m_dataHolder.insert(t_key, t_value);
+      retVal=true;
+      emit settingsSaveRequest(this);
+      emit settingsChanged(this);
+    }
   }
   else
   {
@@ -181,6 +193,7 @@ bool JsonSettingsFile::dropOption(const QString &t_key)
   {
     d->m_dataHolder.remove(t_key);
     retVal = true;
+    emit settingsSaveRequest(this);
     emit settingsChanged(this);
   }
   else
