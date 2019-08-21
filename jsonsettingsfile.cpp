@@ -174,23 +174,16 @@ QString JsonSettingsFile::getOption(const QString &t_key, const QString &t_value
   return retVal;
 }
 
-bool JsonSettingsFile::setOption(const QString &t_key, const QString &t_value, bool t_addIfNotExists)
+bool JsonSettingsFile::setOption(const QString &t_key, const QString &t_value)
 {
   Q_D(JsonSettingsFile);
   bool retVal = false;
-  if(t_addIfNotExists)
+  if(!hasOption(t_key) || d->m_dataHolder.value(t_key).toString() != t_value)
   {
-    if(!hasOption(t_key) || d->m_dataHolder.value(t_key).toString() != t_value)
-    {
-      d->m_dataHolder.insert(t_key, t_value);
-      retVal=true;
-      emit settingsSaveRequest(this);
-      emit settingsChanged(this);
-    }
-  }
-  else
-  {
-    qWarning() << "[json-settings-qml] Refused to set nonexisting key:" << t_key;
+    d->m_dataHolder.insert(t_key, t_value);
+    retVal=true;
+    emit settingsSaveRequest(this);
+    emit settingsChanged(this);
   }
 
   return retVal;

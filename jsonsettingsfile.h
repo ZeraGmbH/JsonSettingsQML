@@ -23,7 +23,7 @@ public:
 
   Q_INVOKABLE bool hasOption(const QString &t_key);
   Q_INVOKABLE QString getOption(const QString &t_key, const QString &t_valueDefault);
-  Q_INVOKABLE bool setOption(const QString &t_key, const QString &t_value, bool t_addIfNotExists=false);
+  Q_INVOKABLE bool setOption(const QString &t_key, const QString &t_value);
   Q_INVOKABLE bool dropOption(const QString &t_key);
 
   Q_INVOKABLE bool autoWriteBackEnabled() const;
