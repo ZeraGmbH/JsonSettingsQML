@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QSaveFile>
 #include <QFileInfo>
+#include <QTimer>
 
 class JsonSettingsFilePrivate {
 
@@ -16,6 +17,8 @@ class JsonSettingsFilePrivate {
   QString m_settingsFilePath;
 
   QJsonObject m_dataHolder;
+
+  QTimer m_transactionTimer;
   bool m_autoWriteBackEnabled=false;
 
   Q_DECLARE_PUBLIC(JsonSettingsFile)
@@ -27,10 +30,18 @@ JsonSettingsFile::JsonSettingsFile(QQuickItem *t_parent) :
   QQuickItem(t_parent),
   d_ptr(new JsonSettingsFilePrivate(this))
 {
-  //save settings every time something changes if m_dPtr->m_autoWriteBackEnabled is true
+  d_ptr->m_transactionTimer.setSingleShot(false);
+
+  // to avoid save storms when multiple options are saved in short time
+  // (e.g on first start setting all defaults) we (re)start a timer
   connect(this,&JsonSettingsFile::settingsSaveRequest,[this](){
-    if(d_ptr->m_autoWriteBackEnabled)
-    {
+    if(d_ptr->m_autoWriteBackEnabled) {
+      d_ptr->m_transactionTimer.start(500);
+    }
+  });
+  connect(&d_ptr->m_transactionTimer,&QTimer::timeout,[this](){
+    if(d_ptr->m_autoWriteBackEnabled) {
+      d_ptr->m_transactionTimer.stop();
       saveToFile(getCurrentFilePath(), true);
     }
   });
