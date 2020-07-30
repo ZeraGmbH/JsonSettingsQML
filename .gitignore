@@ -39,4 +39,5 @@ doc/
 
 # per user project includes
 *.user.pri
+*.txt.user
 
