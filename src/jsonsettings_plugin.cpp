@@ -14,9 +14,9 @@ void JsonSettingsPlugin::init()
 
 void JsonSettingsPlugin::registerTypes(const char *t_uri)
 {
-  // @uri JsonSettings
-  qmlRegisterType<JsonSettingsFile>(t_uri, 1, 0, "ZeraSettings");
-  qmlRegisterType<JsonGlobalSettings>(t_uri, 1, 0, "ZeraGlobalSettings");
+    // @uri JsonSettings
+    qmlRegisterType<JsonSettingsFile>(t_uri, 1, 0, "ZeraSettings");
+    qmlRegisterType<JsonGlobalSettings>(t_uri, 1, 0, "ZeraGlobalSettings");
 }
 
 
