@@ -159,16 +159,9 @@ QString JsonSettingsFile::getOption(const QString &t_key, const QString &t_value
   {
     if(d->m_settingsFilePath.isEmpty() == false)
     {
-      if(!t_valueDefault.isEmpty())
-      {
-        d->m_dataHolder.insert(t_key, t_valueDefault);
-        emit settingsSaveRequest(this);
-        retVal = t_valueDefault;
-      }
-      else
-      {
-        qWarning() << "[json-settings-qml] Could not find data and no default set for key:" << t_key;
-      }
+      d->m_dataHolder.insert(t_key, t_valueDefault);
+      emit settingsSaveRequest(this);
+      retVal = t_valueDefault;
     }
   }
   return retVal;
