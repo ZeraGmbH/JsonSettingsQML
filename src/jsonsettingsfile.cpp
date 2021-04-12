@@ -21,6 +21,8 @@ class JsonSettingsFilePrivate {
     QTimer m_transactionTimer;
     bool m_autoWriteBackEnabled=false;
 
+    bool m_bfireChangeOnSet=false;
+
     Q_DECLARE_PUBLIC(JsonSettingsFile)
 };
 
@@ -163,7 +165,9 @@ bool JsonSettingsFile::setOption(const QString &t_key, const QString &t_value)
         d->m_dataHolder.insert(t_key, t_value);
         retVal=true;
         emit settingsSaveRequest(this);
-        emit settingsChanged(this);
+        if(d_ptr->m_bfireChangeOnSet) {
+            emit settingsChanged(this);
+        }
     }
     return retVal;
 }
@@ -194,6 +198,19 @@ void JsonSettingsFile::setAutoWriteBackEnabled(bool t_autoWriteBackEnabled)
 {
     if(d_ptr->m_autoWriteBackEnabled != t_autoWriteBackEnabled) {
         d_ptr->m_autoWriteBackEnabled=t_autoWriteBackEnabled;
+    }
+}
+
+bool JsonSettingsFile::fireChangeOnSet() const
+{
+    return d_ptr->m_bfireChangeOnSet;
+}
+
+void JsonSettingsFile::setFireChangeOnSet(bool enabled)
+{
+    if(enabled != d_ptr->m_bfireChangeOnSet) {
+        d_ptr->m_bfireChangeOnSet = enabled;
+        emit fireChangeOnSetChanged();
     }
 }
 
