@@ -25,16 +25,21 @@ public:
   Q_INVOKABLE QString getOption(const QString &t_key, const QString &t_valueDefault);
   Q_INVOKABLE bool setOption(const QString &t_key, const QString &t_value);
   Q_INVOKABLE bool dropOption(const QString &t_key);
+  Q_PROPERTY(bool fireChangeOnSet READ fireChangeOnSet WRITE setFireChangeOnSet NOTIFY fireChangeOnSetChanged)
 
   Q_INVOKABLE bool autoWriteBackEnabled() const;
   Q_INVOKABLE void setAutoWriteBackEnabled(bool t_autoWriteBackEnabled=true);
 signals:
   void settingsChanged(JsonSettingsFile *settingsFile);
   void settingsSaveRequest(JsonSettingsFile *settingsFile);
+  void fireChangeOnSetChanged();
 
 public slots:
 
 private:
+  bool fireChangeOnSet() const;
+  void setFireChangeOnSet(bool enabled);
+
   JsonSettingsFilePrivate *d_ptr;
 
   static JsonSettingsFile *s_globalSettings;
