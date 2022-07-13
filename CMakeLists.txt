@@ -121,7 +121,7 @@ include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
     JsonSettingsQmlConfigVersion.cmake
     VERSION ${PACKAGE_VERSION}
-    COMPATIBILITY SameMinorVersion
+    COMPATIBILITY SameMajorVersion
     )
 
 
